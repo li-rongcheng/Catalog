@@ -9,6 +9,7 @@ namespace Catalog.Repositories
     {
         Item GetItem(Guid id);
         IEnumerable<Item> GetItems();
+        void CreateItem(Item item);
     }
 
     public class InMemItemsRepository : IItemsRepository
@@ -28,6 +29,11 @@ namespace Catalog.Repositories
         public Item GetItem(Guid id)
         {
             return items.Where(item => item.Id == id).SingleOrDefault();
+        }
+
+        public void CreateItem(Item item)
+        {
+            items.Add(item);
         }
     }
 }
