@@ -11,6 +11,7 @@ namespace Catalog.Repositories
         IEnumerable<Item> GetItems();
         void CreateItem(Item item);
         void UpdateItem(Item item);
+        void DelteItem(Guid id);
     }
 
     public class InMemItemsRepository : IItemsRepository
@@ -41,6 +42,12 @@ namespace Catalog.Repositories
         {
             var index = items.FindIndex(existingItem => existingItem.Id == item.Id);
             items[index] = item;
+        }
+
+        public void DelteItem(Guid id)
+        {
+            var index = items.FindIndex(existingItem => existingItem.Id == id);
+            items.RemoveAt(index);
         }
     }
 }
