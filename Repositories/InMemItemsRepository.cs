@@ -10,6 +10,7 @@ namespace Catalog.Repositories
         Item GetItem(Guid id);
         IEnumerable<Item> GetItems();
         void CreateItem(Item item);
+        void UpdateItem(Item item);
     }
 
     public class InMemItemsRepository : IItemsRepository
@@ -34,6 +35,12 @@ namespace Catalog.Repositories
         public void CreateItem(Item item)
         {
             items.Add(item);
+        }
+
+        public void UpdateItem(Item item)
+        {
+            var index = items.FindIndex(existingItem => existingItem.Id == item.Id);
+            items[index] = item;
         }
     }
 }
