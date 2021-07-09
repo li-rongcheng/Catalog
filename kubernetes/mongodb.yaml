@@ -1,22 +1,55 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: myapp
+  name: mongodb-statefulset
 spec:
   selector:
     matchLabels:
-      app: myapp
+      app: mongodb # _note_8
+  serviceName: "mongodb-service"    # _note_: not required for normal deployment but required for StatefulSet when assgining names
   template:
     metadata:
       labels:
-        app: myapp
+        app: mongodb  # _note_14: shall keep same as _note_8
     spec:
       containers:
-      - name: myapp
-        image: <Image>
+      - name: mongodb
+        image: mongo
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
-        - containerPort: <Port>
+        - containerPort: 27017  # _note_23
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: "mongoadmin"
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mongodb-password   # _note_: from command: kubectl create secret generic catalog-secrets --from-literal=mongodb-password='Pass#word1'
+              name: catalog-secrets 
+        volumeMounts:
+        - name: data    # _note_34: shall be same as _note_38
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: data    # _note_38: used in _note_34
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  clusterIP: None
+  selector:
+    app: mongodb    # _note_53: shall be same as _note_14
+  ports:
+  - port: 27017
+    targetPort: 27017   # shall be same as _note_23
